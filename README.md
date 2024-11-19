@@ -161,3 +161,45 @@ The LLAMA architecture is an optimized transformer variant that balances efficie
 
 - RAG Basics : https://medium.com/@tejpal.abhyuday/retrieval-augmented-generation-rag-from-basics-to-advanced-a2b068fd576c
 - Lost in the middle phenomenon in LLMS : https://the-decoder.com/large-language-models-and-the-lost-middle-phenomenon/
+
+# Vector Database vs Graph Database for RAG (Retrieval-Augmented Generation)
+
+## 1. Information Extraction
+### **Vector Database:**
+- Text data is divided into chunks (smaller sections or paragraphs).
+- An LLM (Large Language Model) encodes these chunks into **vector embeddings** (numerical representations that capture the meaning of the text).
+
+### **Graph Database:**
+- Focuses on extracting **relational information** (connections between entities like subjects, objects, and actions) instead of embeddings.
+- Creates a **knowledge graph** where relationships between entities are explicitly represented.
+
+---
+
+## 2. Information Indexing
+### **Vector Database:**
+- Encoded vectors are stored in a **vector database**.
+- These vectors are indexed based on their mathematical proximity (e.g., cosine similarity).
+
+### **Graph Database:**
+- Stores the **knowledge graph**, where nodes represent entities and edges represent relationships.
+- Supports queries about relationships between entities.
+
+---
+
+## 3. Information Retrieval
+### **Vector Database:**
+- A question is encoded into a **vector representation**.
+- The vector database finds the **nearest neighbors** (vectors most similar to the question).
+- The closest text chunks are sent to the LLM as context to generate an answer.
+
+### **Graph Database:**
+- For questions about a specific entity or topic (e.g., "What is [X]?"), a **subgraph** of related entities and relationships is retrieved.
+- This subgraph is used as context for the LLM to generate the response.
+
+---
+
+## Key Difference
+- **Vector Database:** Focuses on finding **text chunks** that are semantically similar to the question.
+- **Graph Database:** Focuses on retrieving **connected relationships** and entities relevant to the question.
+
+Both methods aim to provide useful context to the LLM for generating high-quality responses.
