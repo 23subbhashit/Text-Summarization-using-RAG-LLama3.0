@@ -151,3 +151,9 @@ The LLAMA architecture builds on the traditional transformer model, introducing 
 
 ### **Conclusion**
 The LLAMA architecture is an optimized transformer variant that balances efficiency, scalability, and performance. It achieves better memory usage and computational efficiency without sacrificing the model's expressiveness or accuracy.
+
+
+# Retrieval-Augmented Generation (RAG)
+
+- RAG Basics : https://medium.com/@tejpal.abhyuday/retrieval-augmented-generation-rag-from-basics-to-advanced-a2b068fd576c
+- Lost in the middle phenomenon in LLMS : https://the-decoder.com/large-language-models-and-the-lost-middle-phenomenon/
