@@ -5,6 +5,10 @@
 - Link : https://medium.com/@lucnguyen_61589/llama-2-using-huggingface-part-1-3a29fdbaa9ed
 
 
+
+# DECODER ONLY MODELS
+- Link : https://cameronrwolfe.substack.com/p/decoder-only-transformers-the-workhorse
+
 ## Text Summarization with LLaMA and FAISS
 
 ### 1. Dataset Loading:
