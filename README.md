@@ -203,3 +203,28 @@ The LLAMA architecture is an optimized transformer variant that balances efficie
 - **Graph Database:** Focuses on retrieving **connected relationships** and entities relevant to the question.
 
 Both methods aim to provide useful context to the LLM for generating high-quality responses.
+
+
+# Graph Databases vs. Vector Databases in RAG
+
+Graph Databases are favored for Retrieval Augmented Generation (RAG) when compared to Vector Databases. While Vector Databases partition and index data using LLM-encoded vectors, allowing for semantically similar vector retrieval, they may fetch irrelevant data.  
+Graph Databases, on the other hand, build a knowledge base from extracted entity relationships in the text, making retrievals concise. However, it requires exact query matching which can be limiting.  
+A potential solution could be to combine the strengths of both databases: indexing parsed entity relationships with vector representations in a graph database for more flexible information retrieval. It remains to be seen if such a hybrid model exists.  
+After retrieving, you may want to look into filtering the candidates further by adding ranking and/or fine ranking layers that allow you to filter down candidates that do not match your business rules, are not personalized for the user, current context, or response limit.
+
+## Process of RAG
+
+1. **Vector Database Creation**:  
+   RAG starts by converting an internal dataset into vectors and storing them in a vector database (or a database of your choosing).
+
+2. **User Input**:  
+   A user provides a query in natural language, seeking an answer or completion.
+
+3. **Information Retrieval**:  
+   The retrieval mechanism scans the vector database to identify segments that are semantically similar to the user’s query (which is also embedded). These segments are then given to the LLM to enrich its context for generating responses.
+
+4. **Combining Data**:  
+   The chosen data segments from the database are combined with the user’s initial query, creating an expanded prompt.
+
+5. **Generating Text**:  
+   The enlarged prompt, filled with added context, is then given to the LLM, which crafts the final, context-aware response.
