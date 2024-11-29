@@ -162,6 +162,8 @@ The LLAMA architecture is an optimized transformer variant that balances efficie
 - RAG Basics : https://medium.com/@tejpal.abhyuday/retrieval-augmented-generation-rag-from-basics-to-advanced-a2b068fd576c
 - RAG Implementation Basics : https://medium.com/@akriti.upadhyay/implementing-rag-with-langchain-and-hugging-face-28e3ea66c5f7
 - Lost in the middle phenomenon in LLMS : https://the-decoder.com/large-language-models-and-the-lost-middle-phenomenon/
+- RAG LLAMA3 CHROMADB : https://www.kaggle.com/code/gpreda/rag-using-llama3-langchain-and-chromadb
+- RAG USING GPT : https://towardsdatascience.com/retrieval-augmented-generation-rag-from-theory-to-langchain-implementation-4e9bd5f6a4f2
 
 # Vector Database vs Graph Database for RAG (Retrieval-Augmented Generation)
 
