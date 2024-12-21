@@ -46,115 +46,146 @@
 - **ROUGE-2** (bigram overlap)
 - **ROUGE-L** (longest common subsequence)
 
+
+
+
+
 # Detailed Explanation of LLAMA Architecture (Based on the Components in the Image)
-
-The LLAMA architecture builds on the traditional transformer model, introducing optimizations for efficiency and performance. Here's a detailed step-by-step explanation of its workflow and components:
-
----
-
-## 1. **Input Embedding**
-- Input tokens (e.g., words or subwords) are converted into high-dimensional vectors through an **embedding layer**.
-- These embeddings represent the semantic meaning of the tokens in the input sequence.
+The LLAMA architecture is a modern adaptation of the Transformer model, optimized for efficiency and scalability, especially for large-scale NLP tasks such as text generation and summarization. Below is a detailed breakdown:
 
 ---
 
-## 2. **Rotary Positional Encoding (RoPE)**
-- **Purpose**: Adds positional information to the embeddings to reflect token order in the sequence.
-- **Mechanism**: 
-  - Instead of sinusoidal encodings, LLAMA uses **Rotary Positional Encoding (RoPE)**.
-  - RoPE rotates the query and key vectors in a way that preserves **relative positional relationships**, improving performance for long sequences.
+## **1. Input Embedding**
+- **Purpose**: Converts input tokens into dense, high-dimensional vectors that encode their semantic meaning.
+- **How it Works**:
+  - Each token is mapped to a vector using a learned embedding matrix of size \( V \times d \), where \( V \) is the vocabulary size, and \( d \) is the embedding dimension.
+- **Significance**:
+  - Captures semantic relationships between tokens.
+  - The dimensionality \( d \) determines the richness of the representation.
 
 ---
 
-## 3. **RMSNorm Before Attention**
-- **RMSNorm (Root Mean Square Normalization)** is applied to the embeddings before entering the attention mechanism.
-- **Why RMSNorm?**:
-  - It scales the input vectors, stabilizing training.
-  - It is computationally simpler than LayerNorm, improving efficiency.
+## **2. Rotary Positional Encoding (RoPE)**
+- **Purpose**: Encodes the relative position of tokens in the sequence.
+- **Mechanism**:
+  - RoPE applies a rotation matrix to the query (\( Q \)) and key (\( K \)) vectors.
+  - Unlike absolute positional encodings, RoPE captures relative positions, which is crucial for processing long sequences.
+- **Benefits**:
+  - Improved handling of long sequences.
+  - Enhanced representation of positional relationships, ideal for tasks requiring a wide context.
 
 ---
 
-## 4. **Self-Attention (Grouped Multi-Query Attention)**
-- **Purpose**: Captures relationships and dependencies between tokens in the input sequence.
-- **Key Features**:
-  1. **Grouped Multi-Query Attention**:
-     - Unlike traditional multi-head attention where each head has its own key-value pairs, **Grouped Attention** shares key-value pairs among groups of attention heads.
-     - This reduces memory usage and speeds up inference.
-  2. **Key-Value (KV) Cache**:
-     - During decoding (e.g., in autoregressive tasks), previously computed keys and values are cached.
-     - This avoids recomputing them for each step, significantly improving efficiency.
-  3. **Q (Query), K (Key), V (Value)**:
-     - Derived from the input embeddings.
-     - The attention computation is:
-       \[
-       \text{Attention}(Q, K, V) = \text{Softmax}\left(\frac{QK^\top}{\sqrt{d}}\right)V
-       \]
-       where \(d\) is the dimensionality of the query/key vectors.
+## **3. RMSNorm Before Attention**
+- **Purpose**: Stabilizes input embeddings before attention computation.
+- **Why RMSNorm**:
+  - Root Mean Square Normalization normalizes the input vector by its root mean square.
+  - It is computationally simpler and faster than LayerNorm, making it suitable for large models.
 
 ---
 
-## 5. **Feed-Forward Network (SwiGLU)**
-- After attention, a **Feed-Forward Neural Network (FFNN)** is applied to transform the token representations.
-- **SwiGLU (Switchable Gated Linear Unit)**:
-  - Introduces a gating mechanism to improve expressiveness.
-  - Formula:
+## **4. Self-Attention with Grouped Multi-Query Attention (GMQA)**
+- **Purpose**: Enables the model to focus on relevant parts of the input sequence.
+
+### **How Self-Attention Works**:
+- Tokens are transformed into:
+  - **Query (Q)**: What information is being requested.
+  - **Key (K)**: What information is available.
+  - **Value (V)**: The actual content.
+- Attention scores are computed as:
+  \[
+  Attention(Q, K, V) = \text{Softmax}\left(\frac{Q K^\top}{\sqrt{d}}\right)V
+  \]
+
+### **Grouped Multi-Query Attention (GMQA)**:
+- Traditional transformers compute separate \( K \)-\( V \) pairs for every attention head.
+- **In LLAMA**:
+  - Attention heads are grouped, and \( K \)-\( V \) pairs are shared across heads within each group.
+  - **Example**:
+    - For \( H = 16 \) heads grouped into \( G = 4 \) groups, \( K \)-\( V \) pairs are shared within each group, reducing the total number of \( K \)-\( V \) pairs to \( G = 4 \).
+- **Benefits**:
+  - Reduces memory usage and computation.
+  - Retains flexibility as each head computes its own \( Q \).
+
+---
+
+## **5. Key-Value (KV) Cache**
+- **Purpose**: Speeds up inference during autoregressive tasks like text generation.
+
+### **Problem in Decoding**:
+- At each decoding step, recomputing \( K \)-\( V \) pairs for all previous tokens is computationally expensive.
+
+### **Solution: KV Caching**:
+- Previously computed \( K \)-\( V \) pairs are cached.
+- During decoding:
+  - Only \( K \)-\( V \) pairs for the new token are computed.
+  - These new pairs are appended to the cache, which is reused for subsequent attention calculations.
+- **Benefits**:
+  - Avoids redundant computations.
+  - Improves decoding speed and reduces latency.
+
+---
+
+## **6. Feed-Forward Network (SwiGLU)**
+- **Purpose**: Enhances token representations via non-linear transformations.
+- **How SwiGLU Works**:
+  - A gating mechanism selectively activates certain features:
     \[
-    \text{SwiGLU}(x) = (\text{Linear}_1(x) \cdot \sigma(\text{Linear}_2(x)))
+    \text{SwiGLU}(x) = \text{Linear}_1(x) \cdot \sigma(\text{Linear}_2(x))
     \]
-    where \(\sigma\) is the sigmoid activation function.
-  - **Why SwiGLU?**: More efficient and effective than ReLU-based FFNNs used in traditional transformers.
+    where \( \sigma \) is the sigmoid function.
+- **Benefits**:
+  - Improves efficiency compared to ReLU-based FFNNs.
+  - Enables better feature selection.
 
 ---
 
-## 6. **RMSNorm After Feed-Forward**
-- RMSNorm is applied again after the feed-forward network to stabilize outputs and improve gradient flow.
+## **7. RMSNorm After Feed-Forward**
+- **Purpose**: Normalizes outputs of the feed-forward layer to ensure stable training.
+- **Significance**:
+  - Prevents issues like exploding or vanishing gradients.
+  - Ensures consistent activation ranges across layers.
 
 ---
 
-## 7. **Residual Connections**
-- **Purpose**: Ensures that the model can learn additional features without overwriting earlier learned representations.
-- Residual connections are applied around the attention and feed-forward layers, preventing gradient vanishing and improving learning.
+## **8. Residual Connections**
+- **Purpose**: Facilitates better information flow across layers by adding the input to the layer’s output.
+- **Mechanism**:
+  \[
+  \text{Output} = \text{Layer}(x) + x
+  \]
+- **Benefits**:
+  - Prevents gradient vanishing in deep networks.
+  - Helps learn additional features without overwriting existing ones.
 
 ---
 
-## 8. **Repetition of Layers (Nx)**
-- The **attention** and **feed-forward** blocks (along with RMSNorm and residual connections) are repeated \(N\) times.
-- The depth \(N\) enables the model to learn hierarchical representations of the input data.
+## **9. Repetition of Layers (Nx)**
+- **Purpose**: Stacks multiple attention and feed-forward blocks to learn hierarchical patterns.
+- **Workflow**:
+  - Each block consists of:
+    - Self-attention with normalization and residual connections.
+    - Feed-forward with normalization and residual connections.
+  - The number of blocks \( N \) defines the model depth.
+- **Significance**:
+  - Deep architectures enable learning of complex patterns and features.
 
 ---
 
-## 9. **Output Layer**
-- After \(N\) layers, the final token representations are passed through:
-  1. **Linear Layer**: Maps the token representations to logits (one for each token in the vocabulary).
-  2. **Softmax Layer**: Converts logits into probabilities for each token, producing the final output.
+## **10. Output Layer**
+- **Purpose**: Converts the final token representations into probabilities.
+- **Workflow**:
+  - **Linear Layer**: Maps token representations to logits (raw scores).
+  - **Softmax Layer**: Converts logits into probabilities that sum to 1.
+- **Significance**:
+  - The token with the highest probability is selected during text generation tasks.
 
 ---
 
-## Key Enhancements in LLAMA:
-1. **Memory Optimization**:
-   - Grouped Multi-Query Attention reduces the size of key-value matrices.
-   - KV Cache avoids redundant computations during decoding.
-2. **Efficiency**:
-   - SwiGLU activation and RMSNorm reduce computational overhead.
-3. **Scalability**:
-   - RoPE improves handling of longer sequences.
-   - The overall structure ensures that the model remains lightweight and efficient.
+## **Key Takeaways**
+- **Grouped Multi-Query Attention** and **Key-Value Caching** are critical optimizations in LLAMA, reducing memory usage and improving efficiency during training and inference.
+- These innovations make LLAMA highly suitable for large-scale NLP applications, offering a balance between computational efficiency and performance.
 
----
-
-## End-to-End Workflow
-1. **Input Tokens**: Converted to embeddings.
-2. **Positional Encodings**: RoPE adds positional relationships.
-3. **Attention & Feed-Forward**:
-   - Tokens interact via self-attention to capture relationships.
-   - Feed-forward layers refine token representations.
-4. **Repetition**: Layers are stacked \(N\) times for hierarchical learning.
-5. **Output**: Final probabilities for each token are computed via the linear and softmax layers.
-
----
-
-### **Conclusion**
-The LLAMA architecture is an optimized transformer variant that balances efficiency, scalability, and performance. It achieves better memory usage and computational efficiency without sacrificing the model's expressiveness or accuracy.
 
 
 # Retrieval-Augmented Generation (RAG)
