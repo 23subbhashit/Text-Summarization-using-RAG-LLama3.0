@@ -262,3 +262,79 @@ After retrieving, you may want to look into filtering the candidates further by 
 
 5. **Generating Text**:  
    The enlarged prompt, filled with added context, is then given to the LLM, which crafts the final, context-aware response.
+
+## What is Temperature in NLP?
+
+**Temperature** is a parameter in natural language processing (NLP) models that controls the randomness of predictions in text generation tasks. It influences how creative or deterministic the model's outputs are.
+
+---
+
+### How Does Temperature Work?
+
+The temperature adjusts the probabilities of the model's predictions during sampling. It scales the model's raw outputs (logits) before converting them into probabilities.
+
+#### Formula for Adjusting Probabilities:
+\[
+p_i = \frac{\exp{(l_i / T)}}{\sum_{j}{\exp{(l_j / T)}}}
+\]
+
+Where:
+- \( p_i \): Probability of the \(i\)-th token.
+- \( l_i \): Logit (raw score) of the \(i\)-th token.
+- \( T \): Temperature value.
+
+---
+
+### Effects of Temperature
+
+1. **High Temperature (\( T > 1 \)):**
+   - Smoothens the probability distribution, making less likely tokens more probable.
+   - Increases randomness and creativity in the output.
+   - Example: If \( T = 2 \), the model might produce more varied and imaginative responses.
+   - **Risk:** The output may become incoherent or irrelevant.
+
+2. **Low Temperature (\( T < 1 \)):**
+   - Sharpens the probability distribution, favoring tokens with higher initial probabilities.
+   - Produces more deterministic and predictable outputs.
+   - Example: If \( T = 0.5 \), the model generates safe and precise responses.
+   - **Risk:** The output may lack diversity or become repetitive.
+
+3. **Temperature = 1:**
+   - No scaling is applied; logits are converted into probabilities as-is.
+   - Balances creativity and coherence.
+
+---
+
+### Choosing the Right Temperature
+
+- **High Temperature (e.g., 1.5–2.0):**
+  - Suitable for creative tasks like story or poem generation.
+
+- **Low Temperature (e.g., 0.2–0.7):**
+  - Ideal for tasks requiring precision and reliability, like question answering or summarization.
+
+- **Default Temperature (1):**
+  - A balanced approach, offering a mix of creativity and accuracy.
+
+---
+
+### Example:
+
+#### Context:
+"The Eiffel Tower is in Paris, France."
+
+1. **With High Temperature (\( T = 1.5 \)):**
+   - Output:  
+     *"The Eiffel Tower, a famous landmark, stands tall under the Parisian sky, captivating millions of tourists every year."*
+
+2. **With Low Temperature (\( T = 0.5 \)):**
+   - Output:  
+     *"The Eiffel Tower is in Paris, France."*
+
+---
+
+### Summary
+
+- **High Temperature** = More creative, less predictable.
+- **Low Temperature** = More focused, less diverse.
+- **Use Case-Specific**: Adjust the temperature depending on whether you need creativity or precision.
