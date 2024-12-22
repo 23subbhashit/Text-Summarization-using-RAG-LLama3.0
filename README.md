@@ -193,6 +193,7 @@ The LLAMA architecture is a modern adaptation of the Transformer model, optimize
 
 ![RAG IMAGE](https://github.com/user-attachments/assets/9ed5e45c-cb34-46bc-a5da-af05df5683ac)
 - RAG Basics : https://medium.com/@tejpal.abhyuday/retrieval-augmented-generation-rag-from-basics-to-advanced-a2b068fd576c
+- RAG Theory : https://dev.to/codemaker2015/the-ultimate-guide-to-retrieval-augmented-generation-rag-5e6e
 - RAG Implementation Basics : https://medium.com/@akriti.upadhyay/implementing-rag-with-langchain-and-hugging-face-28e3ea66c5f7
 - Lost in the middle phenomenon in LLMS : https://the-decoder.com/large-language-models-and-the-lost-middle-phenomenon/
 - RAG LLAMA3 CHROMADB : https://www.kaggle.com/code/gpreda/rag-using-llama3-langchain-and-chromadb
